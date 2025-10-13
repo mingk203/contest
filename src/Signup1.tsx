@@ -168,10 +168,7 @@ export default function Signup1() {
       </RadioContainer>
 
       {/* 버튼 */}
-     <Button onPress={() => navigation.navigate("Signup2")}>
-  <ButtonText>다음</ButtonText>
-</Button>
-
+     
     </Container>
   );
 }
