@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import styled from "styled-components/native";
+import { NavigationProp } from '@react-navigation/native';
 
-/* ---------------- styled-components ---------------- */
+// RootStackParamList 정의 (여기서는 예시로 'Signup2' 화면만 포함)
+type RootStackParamList = {
+  Signup1: undefined;
+  Signup2: undefined;
+};
+
+// 해당 화면에서 사용할 네비게이션의 타입 정의
+type Signup1NavigationProp = NavigationProp<RootStackParamList, 'Signup1'>;
+
 const Container = styled.View`
   flex: 1;
   justify-content: center;
@@ -46,7 +55,6 @@ const Input = styled.TextInput`
   padding: 0 12px;
   font-size: 15px;
   margin-bottom: 16px;
-  
 `;
 
 const Row = styled.View`
@@ -127,11 +135,18 @@ const ButtonText = styled.Text`
   font-weight: bold;
 `;
 
+interface Signup1Props {
+  navigation: Signup1NavigationProp;
+}
+
 /* ---------------- component ---------------- */
-export default function Signup1() {
+export default function Signup1({ navigation }: Signup1Props) {
   const [disability, setDisability] = useState("무");
-  const [age,setAge]=useState("");
-  
+
+  // "다음" 버튼 클릭 시 Signup2로 이동
+  const handleNext = () => {
+    navigation.navigate("Signup2"); // 데이터 없이 페이지 이동만 수행
+  };
 
   return (
     <Container>
@@ -142,7 +157,7 @@ export default function Signup1() {
 
       {/* 나이 */}
       <Label>나이</Label>
-      <Input placeholder="나이를 입력하세요" keyboardType="numeric"   underlineColorAndroid="transparent"/>
+      <Input placeholder="나이를 입력하세요" keyboardType="numeric" underlineColorAndroid="transparent" />
 
       {/* 키 / 몸무게 */}
       <Label>키/몸무게</Label>
@@ -168,10 +183,9 @@ export default function Signup1() {
       </RadioContainer>
 
       {/* 버튼 */}
-     <Button onPress={() => navigation.navigate("Signup2")}>
-  <ButtonText>다음</ButtonText>
-</Button>
-
+      <Button onPress={handleNext}>
+        <ButtonText>다음</ButtonText>
+      </Button>
     </Container>
   );
 }
