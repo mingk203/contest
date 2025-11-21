@@ -1,15 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components/native";
-import { NavigationProp } from '@react-navigation/native';
 
-// RootStackParamList 정의 (여기서는 예시로 'Signup2' 화면만 포함)
-type RootStackParamList = {
-  Signup1: undefined;
-  Signup2: undefined;
-};
-
-// 해당 화면에서 사용할 네비게이션의 타입 정의
-type Signup1NavigationProp = NavigationProp<RootStackParamList, 'Signup1'>;
+/* ---------------- styled-components ---------------- */
 
 const Container = styled.View`
   flex: 1;
@@ -40,10 +32,11 @@ const SubText = styled.Text`
 `;
 
 const Label = styled.Text`
-  font-size: 15px;
-  color: #888888;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000;
   align-self: flex-start;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 `;
 
 const Input = styled.TextInput`
@@ -80,26 +73,24 @@ const Divider = styled.View`
 
 const RadioContainer = styled.View`
   width: 100%;
-  margin-top: 10px;
   margin-bottom: 30px;
 `;
 
 const RadioLabel = styled.Text`
   font-size: 15px;
-  color: #888888;
+  color: #444;
   margin-bottom: 8px;
 `;
 
 const RadioRow = styled.View`
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
 `;
 
 const RadioButton = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
-  margin-right: 30px;
+  margin-right: 25px;
 `;
 
 const RadioCircle = styled.View`
@@ -109,19 +100,10 @@ const RadioCircle = styled.View`
   border-width: 1px;
   border-color: #aaa;
   margin-right: 6px;
-  justify-content: center;
-  align-items: center;
-`;
-
-const SelectedCircle = styled.View`
-  width: 10px;
-  height: 10px;
-  background-color: #4f7b6c;
-  border-radius: 5px;
 `;
 
 const Button = styled.TouchableOpacity`
-  width: 100px;
+  width: 140px;
   height: 44px;
   background-color: #4f7b6c;
   border-radius: 22px;
@@ -135,55 +117,42 @@ const ButtonText = styled.Text`
   font-weight: bold;
 `;
 
-interface Signup1Props {
-  navigation: Signup1NavigationProp;
-}
-
 /* ---------------- component ---------------- */
-export default function Signup1({ navigation }: Signup1Props) {
-  const [disability, setDisability] = useState("무");
 
-  // "다음" 버튼 클릭 시 Signup2로 이동
-  const handleNext = () => {
-    navigation.navigate("Signup2"); // 데이터 없이 페이지 이동만 수행
-  };
-
+export default function Signup1({ navigation }: { navigation: any }) {
   return (
     <Container>
-      {/* 로고 영역 */}
       <Logo source={{ uri: "https://via.placeholder.com/140x140" }} />
       <LogoText>크루핏</LogoText>
-      <SubText>CREW.FIT  체육진흥공단 DATA</SubText>
+      <SubText>CREW.FIT 체육진흥공단 DATA</SubText>
 
-      {/* 나이 */}
       <Label>나이</Label>
-      <Input placeholder="나이를 입력하세요" keyboardType="numeric" underlineColorAndroid="transparent" />
+      <Input placeholder="나이를 입력하세요" keyboardType="numeric" />
 
-      {/* 키 / 몸무게 */}
-      <Label>키/몸무게</Label>
+      <Label>키 / 몸무게</Label>
       <Row>
         <SmallInput placeholder="cm" keyboardType="numeric" />
         <Divider />
         <SmallInput placeholder="kg" keyboardType="numeric" />
       </Row>
 
-      {/* 장애유무 */}
       <RadioContainer>
         <RadioLabel>장애유무</RadioLabel>
+
         <RadioRow>
-          <RadioButton onPress={() => setDisability("유")}>
-            <RadioCircle>{disability === "유" && <SelectedCircle />}</RadioCircle>
+          <RadioButton>
+            <RadioCircle />
             <RadioLabel>유</RadioLabel>
           </RadioButton>
-          <RadioButton onPress={() => setDisability("무")}>
-            <RadioCircle>{disability === "무" && <SelectedCircle />}</RadioCircle>
+
+          <RadioButton>
+            <RadioCircle />
             <RadioLabel>무</RadioLabel>
           </RadioButton>
         </RadioRow>
       </RadioContainer>
 
-      {/* 버튼 */}
-      <Button onPress={handleNext}>
+      <Button onPress={() => navigation.navigate("Signup2")}>
         <ButtonText>다음</ButtonText>
       </Button>
     </Container>

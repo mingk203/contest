@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components/native";
 
 /* ---------------- styled-components ---------------- */
@@ -64,49 +64,26 @@ const ButtonText = styled.Text`
 `;
 
 /* ---------------- component ---------------- */
-function Signup2() {
-  const [nickname, setNickname] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
+export default function Signup2({ navigation }: { navigation: any }) {
   return (
     <Container>
-      {/* 로고 영역 */}
       <Logo source={{ uri: "https://via.placeholder.com/140x140" }} />
       <LogoText>크루핏</LogoText>
-      <SubText>CREW.FIT  체육진흥공단 DATA</SubText>
+      <SubText>CREW.FIT 체육진흥공단 DATA</SubText>
 
-      {/* 닉네임 */}
       <Label>닉네임</Label>
-      <Input
-        placeholder="닉네임을 입력하세요"
-        value={nickname}
-        onChangeText={(text) => setNickname(text)}
-      />
+      <Input placeholder="닉네임을 입력하세요" />
 
-      {/* 아이디 */}
       <Label>아이디</Label>
-      <Input
-        placeholder="아이디를 입력하세요"
-        value={username}
-        onChangeText={(text) => setUsername(text)}
-      />
+      <Input placeholder="아이디를 입력하세요" />
 
-      {/* 비밀번호 */}
       <Label>비밀번호</Label>
-      <Input
-        placeholder="비밀번호를 입력하세요"
-        secureTextEntry
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-      />
+      <Input placeholder="비밀번호를 입력하세요" secureTextEntry />
 
-      {/* 버튼 */}
-      <Button>
+      <Button onPress={() => navigation.navigate("Signup3")}>
         <ButtonText>다음</ButtonText>
       </Button>
     </Container>
   );
 }
-
-export default Signup2;
