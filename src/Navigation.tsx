@@ -8,10 +8,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import Signup1 from "./Signup1";
 import Signup2 from "./Signup2";
 import Signup3 from "./Signup3";
-import LoginScreen from "./LoginScreen";
 import EditProfile from "./EditProfile";
-import AllCrewsList from "./AllCrewsList";
-import CrewDetail from "./CrewDetail";
 
 // Tabs
 import Home from "./Home";
@@ -77,7 +74,6 @@ export default function Navigation() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}  initialRouteName="Signup1">
       {/* 로그인/회원가입 */}
-      <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup1" component={Signup1} />
       <Stack.Screen name="Signup2" component={Signup2} />
       <Stack.Screen name="Signup3" component={Signup3} />
@@ -86,9 +82,7 @@ export default function Navigation() {
       <Stack.Screen name="MainTabs" component={MainTabs} />
 
       {/* 기타 상세 페이지 */}
-      <Stack.Screen name="AllCrewsList" component={AllCrewsList} />
-      <Stack.Screen name="CrewDetail" component={CrewDetail} />
-      <Stack.Screen name="EditProfile" component={EditProfile} />
+\      <Stack.Screen name="EditProfile" component={EditProfile} />
     </Stack.Navigator>
   );
 }
