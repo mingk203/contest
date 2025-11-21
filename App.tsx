@@ -1,18 +1,52 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Signup1 from './src/Signup1'; // 기존 Signup1 컴포넌트
-import Signup2 from './src/Signup2'; // 새로운 Signup2 컴포넌트 (추가할 페이지)
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-const Stack = createNativeStackNavigator();
+import SplashScreen from './src/screens/SplashScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import SelectCategoryScreen from './src/screens/SelectCategoryScreen';
+import ClubScreen from './src/screens/ClubScreen';
+import ClubDetailScreen from './src/screens/ClubDetailScreen';
+import CourseScreen from './src/screens/CourseScreen';
+import CourseDetailScreen from './src/screens/CourseDetailScreen';
+import SupportModal from './src/screens/SupportModal';
+
+type RootStackParamList = {
+  Splash: undefined;
+  Login: undefined;
+  SelectCategory: undefined;
+  Club: undefined;
+  ClubDetail: { club?: { name?: string; tags?: string; place?: string } };
+  Course: undefined;
+  CourseDetail: undefined;
+  SupportModal: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Signup1">
-        <Stack.Screen name="Signup1" component={Signup1} options={{ title: '회원가입 1' }} />
-        <Stack.Screen name="Signup2" component={Signup2} options={{ title: '회원가입 2' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="Splash"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="Splash" component={SplashScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SelectCategory" component={SelectCategoryScreen} />
+          <Stack.Screen name="Club" component={ClubScreen} />
+          <Stack.Screen name="ClubDetail" component={ClubDetailScreen} />
+          <Stack.Screen name="Course" component={CourseScreen} />
+          <Stack.Screen name="CourseDetail" component={CourseDetailScreen} />
+          <Stack.Screen
+            name="SupportModal"
+            component={SupportModal}
+            options={{ presentation: 'transparentModal' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
