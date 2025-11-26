@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
-import { TouchableOpacity, Image } from "react-native";
+import { TouchableOpacity, Image,View  } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -22,6 +22,7 @@ const TopHeader = styled.View`
   padding: 15px 20px;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between; 
 `;
 
 const LocationText = styled.Text`
@@ -130,6 +131,9 @@ type RootStackParamList = {
   AllCrewsList: undefined;
   MyPage: undefined;
   CrewDetail: undefined;
+   Login: undefined; 
+    Club: undefined;  
+    Course: undefined;  
 
 };
 
@@ -185,9 +189,15 @@ const Home: React.FC<Props> = ({ navigation }) => {
     <>
       <TotalContainer>
 
-        <TopHeader>
-  <Icon name="location-sharp" size={20} color="white" />
-  <LocationText>충청남도 아산시 신창면</LocationText>
+<TopHeader>
+  <View style={{ flexDirection: "row", alignItems: "center" }}>
+    <Icon name="location-sharp" size={20} color="white" />
+    <LocationText>충청남도 아산시 신창면</LocationText>
+  </View>
+
+  <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+    <Icon name="person-circle-outline" size={28} color="white" />
+  </TouchableOpacity>
 </TopHeader>
 
 <BannerWrapper>
@@ -212,7 +222,7 @@ const Home: React.FC<Props> = ({ navigation }) => {
         {/* ------------------------------- */}
         <SectionHeader>
           <SectionTitle>우리 동네 크루</SectionTitle>
-          <ViewAllBtn onPress={() => navigation.navigate("AllCrewsList")}>
+          <ViewAllBtn onPress={() => navigation.navigate("Club")}>
             <Icon name="chevron-forward-outline" size={20} color="#000" />
           </ViewAllBtn>
         </SectionHeader>
@@ -245,6 +255,9 @@ const Home: React.FC<Props> = ({ navigation }) => {
      
 
         <NearTitle>나의 근처 체육시설</NearTitle>
+        <ViewAllBtn onPress={() => navigation.navigate("Course")}>
+            <Icon name="chevron-forward-outline" size={20} color="#000" />
+          </ViewAllBtn>
 
 <NearScroll>
   <NearCard>
