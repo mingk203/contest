@@ -9,13 +9,15 @@ export default function SelectCategoryScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>원하는 메뉴를 선택하세요</Text>
 
+      {/* 지역 동호회 → Club OR MainTabs(Home) 이동 */}
       <TouchableOpacity
         style={styles.btn}
-        onPress={() => navigation.navigate("Club")}
+        onPress={() => navigation.navigate("MainTabs", { screen: "Home" })}
       >
         <Text style={styles.btnText}>📣 지역 동호회</Text>
       </TouchableOpacity>
 
+      {/* 체육 이용권 → CourseScreen 이동 */}
       <TouchableOpacity
         style={styles.btn}
         onPress={() => navigation.navigate("Course")}

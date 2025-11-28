@@ -1,28 +1,19 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Alert,
-} from "react-native";
+// src/screens/SplashScreen.tsx
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 export default function SplashScreen() {
   const navigation = useNavigation<any>();
 
-  const [id, setId] = useState("");
-  const [password, setPassword] = useState("");
+  useEffect(() => {
+    // 1.5초 후 로그인 화면으로 이동
+    const timer = setTimeout(() => {
+      navigation.navigate("Login");
+    }, 1500);
 
-  const handleLogin = () => {
-    if (id.trim() && password.trim()) {
-      navigation.navigate("Club");
-    } else {
-      Alert.alert("아이디와 비밀번호를 입력하세요.");
-    }
-  };
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -32,29 +23,7 @@ export default function SplashScreen() {
         style={styles.logo}
       />
 
-      {/* 로그인 폼 */}
-      <TextInput
-        style={styles.input}
-        placeholder="아이디"
-        placeholderTextColor="#999"
-        value={id}
-        onChangeText={setId}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="비밀번호"
-        placeholderTextColor="#999"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-        <Text style={styles.loginBtnText}>로그인</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity>
-        <Text style={styles.link}>회원가입 / 비밀번호 찾기</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>CREWFIT</Text>
     </View>
   );
 }
@@ -62,40 +31,19 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
+    alignItems: "center",
+    backgroundColor: "#2e5c4d",
   },
   logo: {
-    width: 160,
-    height: 160,
+    width: 150,
+    height: 150,
     marginBottom: 20,
   },
-  input: {
-    width: "75%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 6,
-    fontSize: 15,
-  },
-  loginBtn: {
-    width: "75%",
-    backgroundColor: "#006b5b",
-    borderRadius: 8,
-    padding: 14,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  loginBtnText: {
+  title: {
+    fontSize: 32,
+    fontWeight: "700",
     color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  link: {
-    color: "#777",
-    marginTop: 20,
-    fontSize: 13,
+    letterSpacing: 2,
   },
 });

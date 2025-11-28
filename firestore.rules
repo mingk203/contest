@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+match /databases/{database}/documents {
+match /users/{userId} {
+// 로그인되어 있고, 자신의 UID와 문서 ID가 같을 때만 허용
+allow read, write: if request.auth != null && request.auth.uid == userId;
+}
+}
+}

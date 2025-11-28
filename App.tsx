@@ -1,11 +1,11 @@
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import Navigation from './src/Navigation';  // 🔥 네가 만든 Navigation.tsx 임포트
+import * as React from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import Navigation from "./src/screens/Navigation";
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Navigation />  {/* 🔥 이게 핵심! */}
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <Navigation />   {/* Navigation.tsx 안에 NavigationContainer가 있음 */}
+    </SafeAreaProvider>
   );
 }

@@ -121,7 +121,7 @@ export default function Signup3({ navigation }: { navigation: any }) {
         <FakeTag><FakeTagText>#초보환영</FakeTagText></FakeTag>
       </TagContainer>
 
-      <Button onPress={() => navigation.navigate("Home")}>
+      <Button onPress={() => navigation.navigate("MainTabs", { screen: "Home" })}>
         <ButtonText>회원가입</ButtonText>
       </Button>
     </Container>

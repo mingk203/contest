@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
-import { TouchableOpacity, Image,View  } from "react-native";
+import { TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { useSafeAreaInsets } from "react-native-safe-area-context";  //삼성은 아래에 네비게이션바?같은게 있어서 이걸 해서 안겹피게 만들어줨
 import Swiper from "react-native-swiper";
-
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 // 📌 ScrollView 전체 컨테이너
 const TotalContainer = styled.ScrollView.attrs({
@@ -16,13 +15,13 @@ const TotalContainer = styled.ScrollView.attrs({
 })`
   background-color: #ffffff;
 `;
+
 const TopHeader = styled.View`
   width: 100%;
-  background-color: #3f7361ff; 
+  background-color: #3f7361ff;
   padding: 15px 20px;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between; 
 `;
 
 const LocationText = styled.Text`
@@ -36,8 +35,6 @@ const LocationText = styled.Text`
    📌 상단 배너
 -------------------------------------- */
 
-
-
 const BannerWrapper = styled.View`
   height: 180px;
   width: 100%;
@@ -50,10 +47,10 @@ const BannerSlide = styled.Image`
   border-radius: 10px;
 `;
 
-
 /* -------------------------------------
    📌 섹션 타이틀
 -------------------------------------- */
+
 const SectionHeader = styled.View`
   flex-direction: row;
   justify-content: space-between;
@@ -64,7 +61,7 @@ const SectionHeader = styled.View`
 const SectionTitle = styled.Text`
   font-size: 18px;
   font-weight: bold;
-  color:#2e5c4d;
+  color: #2e5c4d;
 `;
 
 const ViewAllBtn = styled.TouchableOpacity`
@@ -75,6 +72,7 @@ const ViewAllBtn = styled.TouchableOpacity`
 /* -------------------------------------
    📌 우리 동네 크루 카드
 -------------------------------------- */
+
 const CrewCard = styled.View`
   flex-direction: row;
   background-color: #ffffff;
@@ -106,13 +104,9 @@ const CrewDesc = styled.Text`
   margin-top: 3px;
 `;
 
-
-
-
-
-
-
-
+/* -------------------------------------
+   📌 근처 체육시설
+-------------------------------------- */
 
 const NearTitle = styled.Text`
   font-size: 18px;
@@ -120,22 +114,6 @@ const NearTitle = styled.Text`
   margin: 20px 0 10px 20px;
   color: #2e5c4d;
 `;
-
-
-
-
-
-type RootStackParamList = {
-  Home: undefined;
-  CreatePost: undefined;
-  AllCrewsList: undefined;
-  MyPage: undefined;
-  CrewDetail: undefined;
-   Login: undefined; 
-    Club: undefined;  
-    Course: undefined;  
-
-};
 
 const NearScroll = styled.ScrollView.attrs({
   horizontal: true,
@@ -166,16 +144,14 @@ const NearDistance = styled.Text`
   color: #777;
 `;
 
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
+/* =============================
+      📌 Home Screen Component
+============================= */
 
-interface Props {
-  navigation: HomeScreenNavigationProp;
-}
-
-const Home: React.FC<Props> = ({ navigation }) => {
+export default function Home() {
+  const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [nickname, setNickname] = useState("게스트");
-    const insets = useSafeAreaInsets();
-
 
   useEffect(() => {
     const loadNickname = async () => {
@@ -188,40 +164,37 @@ const Home: React.FC<Props> = ({ navigation }) => {
   return (
     <>
       <TotalContainer>
+        {/* 상단 위치 */}
+        <TopHeader>
+          <Icon name="location-sharp" size={20} color="white" />
+          <LocationText>충청남도 아산시 신창면</LocationText>
+        </TopHeader>
 
-<TopHeader>
-  <View style={{ flexDirection: "row", alignItems: "center" }}>
-    <Icon name="location-sharp" size={20} color="white" />
-    <LocationText>충청남도 아산시 신창면</LocationText>
-  </View>
-
-  <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-    <Icon name="person-circle-outline" size={28} color="white" />
-  </TouchableOpacity>
-</TopHeader>
-
-<BannerWrapper>
-  <Swiper
-    autoplay
-    autoplayTimeout={3}
-    showsPagination={true}
-    dotColor="#ccc"
-    activeDotColor="#3f7361"
-  >
-    <BannerSlide source={{ uri: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b" }} />
-    <BannerSlide source={{ uri: "https://images.unsplash.com/photo-1558611848-73f7eb4001ab" }} />
-    <BannerSlide source={{ uri: "https://images.unsplash.com/photo-1583454110550-360ebd2d9f6c" }} />
-  </Swiper>
-</BannerWrapper>
-
-
-       
+        {/* 배너 */}
+        <BannerWrapper>
+          <Swiper
+            autoplay
+            autoplayTimeout={3}
+            showsPagination={true}
+            dotColor="#ccc"
+            activeDotColor="#3f7361"
+          >
+            <BannerSlide source={{ uri: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b" }} />
+            <BannerSlide source={{ uri: "https://images.unsplash.com/photo-1558611848-73f7eb4001ab" }} />
+            <BannerSlide source={{ uri: "https://images.unsplash.com/photo-1583454110550-360ebd2d9f6c" }} />
+          </Swiper>
+        </BannerWrapper>
 
         {/* ------------------------------- */}
         {/* 📌 우리 동네 크루 */}
         {/* ------------------------------- */}
         <SectionHeader>
           <SectionTitle>우리 동네 크루</SectionTitle>
+
+          {/* 
+            🔥 네비게이션 구조상 AllCrewsList가 "없음".
+            그래서 "Club"으로 이동하도록 수정 
+          */}
           <ViewAllBtn onPress={() => navigation.navigate("Club")}>
             <Icon name="chevron-forward-outline" size={20} color="#000" />
           </ViewAllBtn>
@@ -252,45 +225,31 @@ const Home: React.FC<Props> = ({ navigation }) => {
           </CrewInfo>
         </CrewCard>
 
-     
-
+        {/* ------------------------------- */}
+        {/* 📌 근처 체육시설 */}
+        {/* ------------------------------- */}
         <NearTitle>나의 근처 체육시설</NearTitle>
-        <ViewAllBtn onPress={() => navigation.navigate("Course")}>
-            <Icon name="chevron-forward-outline" size={20} color="#000" />
-          </ViewAllBtn>
 
-<NearScroll>
-  <NearCard>
-    <Icon name="fitness" size={26} color="#3f7361" />
-    <NearName>신창 헬스장</NearName>
-    <NearDistance>450m</NearDistance>
-  </NearCard>
+        <NearScroll>
+          <NearCard>
+            <Icon name="fitness" size={26} color="#3f7361" />
+            <NearName>신창 헬스장</NearName>
+            <NearDistance>450m</NearDistance>
+          </NearCard>
 
-  <NearCard>
-    <Icon name="barbell" size={26} color="#3f7361" />
-    <NearName>슬기로운 PT샵</NearName>
-    <NearDistance>800m</NearDistance>
-  </NearCard>
+          <NearCard>
+            <Icon name="barbell" size={26} color="#3f7361" />
+            <NearName>슬기로운 PT샵</NearName>
+            <NearDistance>800m</NearDistance>
+          </NearCard>
 
-  <NearCard>
-    <Icon name="walk" size={26} color="#3f7361" />
-    <NearName>신창 걷기 코스</NearName>
-    <NearDistance>300m</NearDistance>
-  </NearCard>
-</NearScroll>
-
-
-
-    </TotalContainer>
-
-      {/* 플로팅 버튼
-      <FloatingButton onPress={() => navigation.navigate("CreatePost")}>
-        <Icon name="add" size={32} color="#fff" />
-      </FloatingButton> */}
-
-      
+          <NearCard>
+            <Icon name="walk" size={26} color="#3f7361" />
+            <NearName>신창 걷기 코스</NearName>
+            <NearDistance>300m</NearDistance>
+          </NearCard>
+        </NearScroll>
+      </TotalContainer>
     </>
   );
-};
-
-export default Home;
+}
