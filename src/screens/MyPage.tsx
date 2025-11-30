@@ -1,159 +1,72 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View, Alert } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-
-// ---------------------
-// 📌 상단 위치 헤더 스타일 추가
-// ---------------------
-const TopHeader = styled.View`
-  width: 100%;
-  background-color: #3f7361ff;
-  padding: 15px 20px;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const LocationText = styled.Text`
-  font-size: 17px;
-  font-weight: 600;
-  color: white;
-  margin-left: 8px;
-`;
-
-// ---------------------
-// 📌 ScrollView
-// ---------------------
-const Container = styled.ScrollView`
-  background-color: #fff;
-  padding: 20px;
-  padding-bottom: 80px; /* Footer와 겹치지 않도록 */
-`;
-
-const Header = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom-width: 1px;
-  border-bottom-color: #ddd;
-  padding-bottom: 10px;
-`;
-
-// ---------------------
-const ProfileSection = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-const ProfileCircle = styled.View`
-  width: 60px;
-  height: 60px;
-  background-color: #d9d9d9;
-  border-radius: 30px;
-`;
-
-const ProfileInfo = styled.View`
-  margin-left: 12px;
-`;
-
-const NameText = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-`;
-
-const JoinText = styled.Text`
-  font-size: 13px;
-  color: #777;
-`;
-
-const MenuWrapper = styled.View`
-  position: relative;
-`;
-
-const MenuBox = styled.View`
-  position: absolute;
-  top: 28px;
-  right: 0;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  shadow-color: #000;
-  shadow-opacity: 0.1;
-  shadow-radius: 3px;
-  elevation: 3;
-`;
-
-const MenuButton = styled.TouchableOpacity`
-  padding: 10px 14px;
-  width: 130px;
-  height: 40px;
-`;
-
-const MenuText = styled.Text`
-  font-size: 14px;
-  color: #006b5b;
-`;
-
-const Section = styled.View`
-  margin-top: 20px;
-`;
-
-const SectionTitle = styled.Text`
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #085c0eff;
-`;
-
-const PlaceholderBox = styled.View`
-  width: 100%;
-  height: 100px;
-  background-color: #f1f1f1;
-  border-radius: 12px;
-`;
-
-// ---------------------
+import { auth } from '../firebaseConfig'; 
+import AsyncStorage from "@react-native-async-storage/async-storage"; // 🔥 추가
 
 const MyPage = ({ navigation }: { navigation: any }) => {
+  const [userEmail, setUserEmail] = useState("-");
+  const [userTags, setUserTags] = useState<string[]>([]);
   const [menuVisible, setMenuVisible] = useState(false);
 
-    // ✔ 메뉴 자동 닫기 타이머
+  // 화면이 포커스 될 때마다 정보 갱신
   useEffect(() => {
-    if (menuVisible) {
-      const timer = setTimeout(() => {
-        setMenuVisible(false);
-      }, 2000); // 2초 후 자동 닫힘
+    const fetchUserData = async () => {
+      // 1. 이메일 정보 가져오기
+      const user = auth.currentUser;
+      if (user && user.email) {
+        setUserEmail(user.email);
+      } else {
+        setUserEmail("게스트");
+      }
 
-      return () => clearTimeout(timer);
-    }
-  }, [menuVisible]);
+      // 2. 🔥 저장된 태그 불러오기 (DB 대용)
+      try {
+        const savedTags = await AsyncStorage.getItem("userTags");
+        if (savedTags) {
+          setUserTags(JSON.parse(savedTags));
+        } else {
+          // 태그가 없으면 기본값
+          setUserTags(["#운동초보", "#열정만땅"]);
+        }
+      } catch (e) {
+        console.log("태그 불러오기 실패", e);
+      }
+    };
 
-  // ✔ EditProfile 페이지 이동 시 메뉴 자동 닫기
-  const goEditProfile = () => {
-    setMenuVisible(false);       // 메뉴 즉시 닫힘
-    navigation.navigate("EditProfile");
-  };
+    const unsubscribe = navigation.addListener('focus', fetchUserData);
+    return unsubscribe;
+  }, [navigation]);
 
+  const displayNickname = userEmail.split('@')[0]; // 이메일 앞부분을 닉네임으로
 
   return (
     <>
-      {/* 📌 상단 위치 헤더 추가 */}
       <TopHeader>
         <Icon name="location-sharp" size={20} color="white" />
         <LocationText>충청남도 아산시 신창면</LocationText>
       </TopHeader>
 
       <Container>
-
-        {/* 프로필 헤더 */}
         <Header>
           <ProfileSection>
-            <ProfileCircle />
+            <ProfileCircle>
+               <Icon name="person" size={35} color="#fff" />
+            </ProfileCircle>
+            
             <ProfileInfo>
-              <NameText>노니</NameText>
-              <JoinText>가입일: 2025.10.03</JoinText>
+              <NameText>{displayNickname} 님</NameText> 
+              <EmailText>{userEmail}</EmailText>
+              
+              <TagRow>
+                {/* 🔥 내가 선택한 태그들이 여기에 표시됨 */}
+                {userTags.map((tag, index) => (
+                  <TagBadge key={index}>
+                    <TagText>{tag}</TagText>
+                  </TagBadge>
+                ))}
+              </TagRow>
             </ProfileInfo>
           </ProfileSection>
 
@@ -164,29 +77,53 @@ const MyPage = ({ navigation }: { navigation: any }) => {
 
             {menuVisible && (
               <MenuBox>
-                <MenuButton onPress={goEditProfile}>
-                  <MenuText>내 정보 수정하기</MenuText>
+                <MenuButton onPress={() => {
+                   auth.signOut();
+                   // 로그아웃 시 저장된 태그도 초기화하고 싶다면:
+                   // AsyncStorage.removeItem("userTags");
+                   navigation.reset({routes: [{name: "Login"}]});
+                }}>
+                  <MenuText style={{color: 'red'}}>로그아웃</MenuText>
                 </MenuButton>
               </MenuBox>
             )}
           </MenuWrapper>
         </Header>
 
-        {/* 가입된 동호회 */}
         <Section>
-          <SectionTitle>가입된 동호회</SectionTitle>
-          <PlaceholderBox />
+          <SectionTitle>🏃 가입된 동호회</SectionTitle>
+          <PlaceholderBox><EmptyText>아직 가입된 동호회가 없습니다.</EmptyText></PlaceholderBox>
         </Section>
 
-        {/* 내가 좋아하는 동호회 */}
         <Section>
-          <SectionTitle>내가 좋아하는 동호회</SectionTitle>
-          <PlaceholderBox />
+          <SectionTitle>❤️ 찜한 동호회</SectionTitle>
+          <PlaceholderBox><EmptyText>찜한 동호회가 없습니다.</EmptyText></PlaceholderBox>
         </Section>
-
       </Container>
     </>
   );
 };
 
 export default MyPage;
+
+/* 스타일 컴포넌트 */
+const TopHeader = styled.View` width: 100%; background-color: #3f7361; padding: 15px 20px; flex-direction: row; align-items: center; `;
+const LocationText = styled.Text` font-size: 17px; font-weight: 600; color: white; margin-left: 8px; `;
+const Container = styled.ScrollView` flex: 1; background-color: #f8f9fa; padding: 20px; `;
+const Header = styled.View` background-color: #fff; border-radius: 16px; padding: 20px; margin-bottom: 25px; flex-direction: row; justify-content: space-between; align-items: flex-start; elevation: 3; `;
+const ProfileSection = styled.View` flex-direction: row; align-items: center; flex: 1; `;
+const ProfileCircle = styled.View` width: 64px; height: 64px; background-color: #2e5c4d; border-radius: 32px; justify-content: center; align-items: center; `;
+const ProfileInfo = styled.View` margin-left: 16px; flex: 1; `;
+const NameText = styled.Text` font-size: 18px; font-weight: bold; color: #222; `;
+const EmailText = styled.Text` font-size: 13px; color: #777; margin-top: 2px; margin-bottom: 6px;`;
+const TagRow = styled.View` flex-direction: row; flex-wrap: wrap; gap: 6px; `;
+const TagBadge = styled.View` background-color: #e8f5e9; padding: 4px 8px; border-radius: 6px; `;
+const TagText = styled.Text` color: #2e5c4d; font-size: 11px; font-weight: 700; `;
+const MenuWrapper = styled.View` position: relative; `;
+const MenuBox = styled.View` position: absolute; top: 30px; right: 0; background-color: white; border-radius: 8px; elevation: 5; z-index: 10; min-width: 100px; `;
+const MenuButton = styled.TouchableOpacity` padding: 12px; `;
+const MenuText = styled.Text` font-size: 14px; color: #333; `;
+const Section = styled.View` margin-bottom: 30px; `;
+const SectionTitle = styled.Text` font-size: 17px; font-weight: bold; margin-bottom: 12px; color: #333; margin-left: 4px; `;
+const PlaceholderBox = styled.View` width: 100%; height: 80px; background-color: #fff; border-radius: 12px; justify-content: center; align-items: center; border: 1px dashed #ccc; `;
+const EmptyText = styled.Text` color: #999; font-size: 14px; `;

@@ -1,147 +1,162 @@
 import React from "react";
 import styled from "styled-components/native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { Alert } from "react-native";
 
 const EditProfile = ({ navigation }) => {
   return (
-<>
-    <TopHeader>
-        <Icon name="location-sharp" size={20} color="white" />
-        <LocationText>충청남도 아산시 신창면</LocationText>
+    <>
+      <TopHeader>
+        {/* 뒤로가기 버튼 기능 추가 */}
+        <BackButton onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="white" />
+        </BackButton>
+        <HeaderTitle>내 정보 수정</HeaderTitle>
+        <View style={{width: 24}} /> 
       </TopHeader>
 
-    <Container>
-      <ProfileWrapper>
-        <ProfileCircle />
-        <UploadBtn>
-          <Icon name="camera" size={20} color="#fff" />
-        </UploadBtn>
-      </ProfileWrapper>
+      <Container>
+        <ProfileWrapper>
+          <ProfileCircle>
+             <Icon name="person" size={60} color="#fff" />
+          </ProfileCircle>
+          <UploadBtn onPress={() => Alert.alert("준비중", "사진 변경 기능은 준비중입니다.")}>
+            <Icon name="camera" size={18} color="#fff" />
+          </UploadBtn>
+        </ProfileWrapper>
 
-      <InputWrapper>
-        <Label>닉네임</Label>
-        <Input placeholder="닉네임을 입력하세요" value="노니" />
-      </InputWrapper>
+        <FormArea>
+          <InputWrapper>
+            <Label>닉네임</Label>
+            <Input 
+              placeholder="닉네임 입력" 
+              defaultValue="ch" 
+            />
+          </InputWrapper>
 
-      <InputWrapper>
-        <Label>아이디</Label>
-        <Input placeholder="아이디를 입력하세요" value="NANYONI" />
-      </InputWrapper>
+          <InputWrapper>
+            <Label>한줄 소개</Label>
+            <Input 
+              placeholder="나를 소개해주세요" 
+              defaultValue="운동을 좋아하는 직장인입니다!" 
+            />
+          </InputWrapper>
 
-      <InputWrapper>
-        <Label>비밀번호</Label>
-        <Input
-          placeholder="비밀번호"
-          secureTextEntry
-          value="DDONG"
-        />
-      </InputWrapper>
+          <InputWrapper>
+            <Label>관심 태그</Label>
+            <Input 
+              defaultValue="#러닝 #배드민턴"
+              editable={false} 
+              style={{backgroundColor: '#f0f0f0', color: '#555'}}
+            />
+          </InputWrapper>
+        </FormArea>
 
-      <SubmitButton onPress={() => navigation.goBack()}>
-        <SubmitText>저장하기</SubmitText>
-      </SubmitButton>
-    </Container>
+        <SubmitButton onPress={() => {
+            Alert.alert("완료", "정보가 저장되었습니다! (데모)");
+            navigation.goBack();
+        }}>
+          <SubmitText>저장하기</SubmitText>
+        </SubmitButton>
+      </Container>
     </>
   );
 };
 
 export default EditProfile;
 
-// ------------------------------------------------------
-// ⭐ 스타일 컴포넌트들
-// ------------------------------------------------------
-
+// --- 스타일 ---
 const TopHeader = styled.View`
   width: 100%;
-  background-color: #3f7361ff;
-  padding: 15px 20px;
+  background-color: #3f7361;
+  padding: 15px 16px;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
 `;
-
-const LocationText = styled.Text`
-  font-size: 17px;
-  font-weight: 600;
+const BackButton = styled.TouchableOpacity``;
+const HeaderTitle = styled.Text`
+  font-size: 18px;
+  font-weight: 700;
   color: white;
-  margin-left: 8px;
 `;
 
-
-const Container = styled.View`
+const Container = styled.ScrollView`
   flex: 1;
-  background-color: #f8f9fa;
-  padding: 30px;
-  align-items: center;
+  background-color: #fff;
+  padding: 30px 20px;
 `;
 
 const ProfileWrapper = styled.View`
+  align-items: center;
+  margin-bottom: 40px;
   position: relative;
-  margin-bottom: 30px;
 `;
 
 const ProfileCircle = styled.View`
-  width: 120px;
-  height: 120px;
-  background-color: #e5e5e5;
-  border-radius: 60px;
-  elevation: 4;
-  shadow-color: #000;
-  shadow-opacity: 0.1;
-  shadow-radius: 5px;
+  width: 110px; height: 110px;
+  background-color: #d1e0db;
+  border-radius: 55px;
+  justify-content: center; align-items: center;
+  border: 4px solid #fff;
+  elevation: 5;
 `;
 
 const UploadBtn = styled.TouchableOpacity`
   position: absolute;
   bottom: 0;
-  right: 0;
-  background-color: #3f7361;
-  width: 38px;
-  height: 38px;
-  border-radius: 20px;
+  right: 35%; 
+  background-color: #2e5c4d;
+  width: 34px; height: 34px;
+  border-radius: 17px;
   align-items: center;
   justify-content: center;
-  elevation: 4;
+  border: 2px solid #fff;
+`;
+
+const FormArea = styled.View`
+  width: 100%;
+  margin-bottom: 20px;
 `;
 
 const InputWrapper = styled.View`
   width: 100%;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 `;
 
 const Label = styled.Text`
   font-size: 14px;
-  color: #2e5c4d;
-  margin-bottom: 6px;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 8px;
+  margin-left: 4px;
 `;
 
 const Input = styled.TextInput`
   width: 100%;
-  height: 46px;
-  background-color: white;
-  border: 1.5px solid #d0d0d0;
-  border-radius: 10px;
-  padding: 0 12px;
-
-  /* 부드러운 그림자 */
-  elevation: 2;
-  shadow-color: #000;
-  shadow-opacity: 0.06;
-  shadow-radius: 4px;
+  height: 50px;
+  background-color: #fcfcfc;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 15px;
+  color: #333;
 `;
 
 const SubmitButton = styled.TouchableOpacity`
   width: 100%;
-  height: 50px;
+  height: 52px;
   background-color: #3f7361;
   border-radius: 12px;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
-  elevation: 4;
+  margin-top: 10px;
+  elevation: 2;
+  margin-bottom: 50px;
 `;
 
 const SubmitText = styled.Text`
   color: #fff;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: bold;
 `;
