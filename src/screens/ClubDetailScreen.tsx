@@ -9,12 +9,16 @@ import {
   Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";   // ✅ 추가
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 export default function ClubDetailScreen() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation(); // ✅ 뒤로가기 활성화
+  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+
+  // 🔥 클릭한 동호회 데이터 받기
+  const route = useRoute();
+  const { club } = route.params as any;
 
   return (
     <View style={styles.container}>
@@ -23,40 +27,33 @@ export default function ClubDetailScreen() {
 
       {/* 헤더 */}
       <View style={styles.header}>
-
-        {/* 🔥 뒤로가기 버튼 추가 */}
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backBtn}>←</Text>
         </TouchableOpacity>
 
-        <Text style={styles.location}>📍 충청남도 아산시 신창면</Text>
-        <View style={{ width: 24 }} /> 
+        <Text style={styles.location}>📍 {club.location}</Text>
+        <View style={{ width: 24 }} />
       </View>
 
-      {/* 본문 */}
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 50 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
         {/* 동호회 사진 */}
         <View style={styles.photoBox}>
           <Text style={styles.photoText}>동호회 사진</Text>
         </View>
 
-        {/* 기본 정보 */}
+        {/* 🔥 Firestore 기본 정보 */}
         <View style={styles.infoBox}>
-          <Text style={styles.clubName}>동호회 명</Text>
-          <Text style={styles.clubTag}>#어떤 동호회</Text>
+          <Text style={styles.clubName}>{club.name}</Text>
+          <Text style={styles.clubTag}>{club.desc}</Text>
         </View>
 
-        {/* 세부내용 제목 */}
-        <Text style={styles.sectionTitle}>동호회세부내용</Text>
+        {/* 세부 내용 */}
+        <Text style={styles.sectionTitle}>동호회 세부내용</Text>
 
-        {/* 세부내용 박스 */}
         <View style={styles.detailBox}>
-          <Text style={styles.detailItem}>목표</Text>
-          <Text style={styles.detailItem}>모집 크루 조건</Text>
-          <Text style={styles.detailItem}>장소 및 일시</Text>
+          <Text style={styles.detailItem}>목표: {club.goal}</Text>
+          <Text style={styles.detailItem}>모집 조건: {club.condition}</Text>
+          <Text style={styles.detailItem}>장소 및 일시: {club.schedule}</Text>
         </View>
 
         {/* 지원하기 버튼 */}
@@ -69,12 +66,7 @@ export default function ClubDetailScreen() {
       </ScrollView>
 
       {/* 지원 모달 */}
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
+      <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>동호회 지원 하시겠습니까?</Text>
@@ -107,7 +99,6 @@ export default function ClubDetailScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
 
-  /** 헤더 + 뒤로가기 버튼 */
   header: {
     backgroundColor: "#2e5c4d",
     flexDirection: "row",
@@ -129,7 +120,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  /** 사진 */
   photoBox: {
     backgroundColor: "#ddd",
     height: 140,
@@ -141,7 +131,6 @@ const styles = StyleSheet.create({
   },
   photoText: { color: "#333", fontSize: 16, fontWeight: "700" },
 
-  /** 기본 정보 */
   infoBox: {
     marginTop: 15,
     backgroundColor: "#f5f5f5",
@@ -152,7 +141,6 @@ const styles = StyleSheet.create({
   clubName: { fontSize: 16, fontWeight: "700", marginBottom: 4 },
   clubTag: { color: "#666", fontSize: 13 },
 
-  /** 세부 내용 */
   sectionTitle: {
     marginTop: 25,
     marginLeft: 22,
@@ -175,7 +163,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  /** 지원하기 버튼 */
   applyButton: {
     backgroundColor: "#2e5c4d",
     marginHorizontal: 20,
@@ -190,7 +177,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  /** 모달 */
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.3)",

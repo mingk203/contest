@@ -1,26 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-
-const { width } = Dimensions.get("window");
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebaseConfig";
 
 export default function ClubScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
 
-  const [selected, setSelected] = useState<"club" | "course">("club"); // 선택 상태
+  const [selected, setSelected] = useState<"club" | "course">("club");
+  const [clubs, setClubs] = useState<any[]>([]); // 🔥 Firestore에서 불러온 데이터 저장
+
+  // 🔥 Firestore에서 crewPosts 가져오기
+  useEffect(() => {
+    const fetchClubs = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, "crewPosts"));
+        const list = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setClubs(list);
+      } catch (error) {
+        console.log("❌ Firestore 불러오기 실패:", error);
+      }
+    };
+
+    fetchClubs();
+  }, []);
 
   return (
     <View style={styles.container}>
-      {/* 상단 상태바 영역 */}
+      {/* 상단 상태바 */}
       <View style={{ height: insets.top, backgroundColor: "#2e5c4d" }} />
 
       {/* 헤더 */}
@@ -30,7 +48,6 @@ export default function ClubScreen() {
         </TouchableOpacity>
 
         <Text style={styles.location}>📍 충청남도 아산시 신창면</Text>
-
         <View style={{ width: 24 }} />
       </View>
 
@@ -40,23 +57,16 @@ export default function ClubScreen() {
         contentContainerStyle={{ paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* 제목 */}
         <Text style={styles.title}>지역 동호회</Text>
 
-        {/* =====================
-            🔥 카테고리 버튼
-        ====================== */}
+        {/* 카테고리 버튼 */}
         <View style={styles.categoryContainer}>
-          {/* 지역 동호회 */}
           <TouchableOpacity
             style={[
               styles.categoryBtn,
               selected === "club" && styles.activeCategory,
             ]}
-            onPress={() => {
-              setSelected("club");
-              navigation.navigate("Club");
-            }}
+            onPress={() => setSelected("club")}
           >
             <Text
               style={[
@@ -68,7 +78,6 @@ export default function ClubScreen() {
             </Text>
           </TouchableOpacity>
 
-          {/* 체육 이용권 */}
           <TouchableOpacity
             style={[
               styles.categoryBtn,
@@ -90,55 +99,31 @@ export default function ClubScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* ======================
-            🔥 동호회 카드 리스트
-        ======================= */}
+        {/* 🔥 Firestore에서 가져온 동호회 카드들 */}
         <View style={styles.cardContainer}>
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() =>
-              navigation.navigate("ClubDetail", {
-                club: {
-                  name: "농구의 신",
-                  tags: "#운동 #농구",
-                  place: "아산시 실내체육관",
-                },
-              })
-            }
-          >
-            <View style={styles.imageBox} />
-            <View style={styles.textBox}>
-              <Text style={styles.clubName}>농구의 신</Text>
-              <Text style={styles.tag}>#운동 #농구</Text>
-              <Text style={styles.place}>아산시 실내체육관</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() =>
-              navigation.navigate("ClubDetail", {
-                club: {
-                  name: "달리기 모임",
-                  tags: "#러닝 #건강",
-                  place: "신창면 운동장",
-                },
-              })
-            }
-          >
-            <View style={styles.imageBox} />
-            <View style={styles.textBox}>
-              <Text style={styles.clubName}>달리기 모임</Text>
-              <Text style={styles.tag}>#러닝 #건강</Text>
-              <Text style={styles.place}>신창면 운동장</Text>
-            </View>
-          </TouchableOpacity>
+          {clubs.map((club) => (
+            <TouchableOpacity
+              key={club.id}
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate("ClubDetail", {
+                  club,
+                })
+              }
+            >
+              <View style={styles.imageBox} />
+              <View style={styles.textBox}>
+                <Text style={styles.clubName}>{club.name}</Text>
+                <Text style={styles.tag}>{club.desc}</Text>
+                <Text style={styles.place}>{club.location}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
     </View>
   );
 }
-
 /* ============================
     🎨 스타일
 ============================ */

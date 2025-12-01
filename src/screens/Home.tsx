@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
-import { TouchableOpacity } from "react-native";
+// import { TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Swiper from "react-native-swiper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import { 
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs 
+} from "firebase/firestore";
+
+import { db } from "../firebaseConfig";
 
 // 📌 ScrollView 전체 컨테이너
 const TotalContainer = styled.ScrollView.attrs({
@@ -152,13 +161,38 @@ export default function Home() {
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
   const [nickname, setNickname] = useState("게스트");
-
-  useEffect(() => {
+const [crewList, setCrewList] = useState<any[]>([]);
+    useEffect(() => {
     const loadNickname = async () => {
       const savedNickname = await AsyncStorage.getItem("userNickname");
       if (savedNickname) setNickname(savedNickname);
     };
     loadNickname();
+  }, []);
+
+  // 🔥 크루 데이터 불러오기
+  useEffect(() => {
+    const loadCrews = async () => {
+      try {
+        const q = query(
+          collection(db, "crewPosts"),
+          orderBy("createdAt", "desc"),
+          limit(3)
+        );
+
+        const snapshot = await getDocs(q);
+        const list = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setCrewList(list);
+      } catch (error) {
+        console.log("❌ Firestore 로드 실패:", error);
+      }
+    };
+
+    loadCrews();
   }, []);
 
   return (
@@ -185,45 +219,32 @@ export default function Home() {
           </Swiper>
         </BannerWrapper>
 
-        {/* ------------------------------- */}
-        {/* 📌 우리 동네 크루 */}
-        {/* ------------------------------- */}
-        <SectionHeader>
-          <SectionTitle>우리 동네 크루</SectionTitle>
+    
+{/* 📌 우리 동네 크루 */}
+{/* ------------------------------- */}
+<SectionHeader>
+  <SectionTitle>우리 동네 크루</SectionTitle>
+  <ViewAllBtn onPress={() => navigation.navigate("Club")}>
+    <Icon name="chevron-forward-outline" size={20} color="#000" />
+  </ViewAllBtn>
+</SectionHeader>
 
-          {/* 
-            🔥 네비게이션 구조상 AllCrewsList가 "없음".
-            그래서 "Club"으로 이동하도록 수정 
-          */}
-          <ViewAllBtn onPress={() => navigation.navigate("Club")}>
-            <Icon name="chevron-forward-outline" size={20} color="#000" />
-          </ViewAllBtn>
-        </SectionHeader>
+{/* Firestore에서 불러온 최신 3개 크루 표시 */}
+{crewList.length === 0 ? (
+  <CrewDesc style={{ marginLeft: 20, marginBottom: 10 }}>
+    등록된 크루가 없습니다.
+  </CrewDesc>
+) : (
+  crewList.map((crew) => (
+    <CrewCard key={crew.id}>
+      <CrewInfo>
+        <CrewName>{crew.name}</CrewName>
+        <CrewDesc>{crew.desc}</CrewDesc>
+      </CrewInfo>
+    </CrewCard>
+  ))
+)}
 
-        <CrewCard>
-          <CrewImage
-            source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Running_icon.png"
-            }}
-          />
-          <CrewInfo>
-            <CrewName>러닝 크루 MZ</CrewName>
-            <CrewDesc>한강을 기준으로 어떤 러닝을 목표로 합니다</CrewDesc>
-          </CrewInfo>
-        </CrewCard>
-
-        <CrewCard>
-          <CrewImage
-            source={{
-              uri:
-                "https://upload.wikimedia.org/wikipedia/commons/9/9b/Badminton_racket_and_shuttlecock.png"
-            }}
-          />
-          <CrewInfo>
-            <CrewName>배드민턴 크루 MZ</CrewName>
-            <CrewDesc>배드민턴 대회 제외 취미로 하는 배드민턴</CrewDesc>
-          </CrewInfo>
-        </CrewCard>
 
         {/* ------------------------------- */}
         {/* 📌 근처 체육시설 */}

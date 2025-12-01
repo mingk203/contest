@@ -1,5 +1,5 @@
 // src/screens/LoginScreen.tsx
-import React, { useState } from "react";
+import React, { useState }  from "react";
 import {
   View,
   Text,
@@ -7,24 +7,51 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Alert,
+  Alert,  
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const navigation = useNavigation<any>();
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+const handleLogin = async () => {
+  if (!id.trim() || !password.trim()) {
+    Alert.alert("아이디와 비밀번호를 입력하세요.");
+    return;
+  }
 
-  const handleLogin = () => {
-    if (id.trim() && password.trim()) {
-      // 🔥 기존: navigation.navigate("SelectCategory");
-      navigation.navigate("MainTabs");  // ← 여기가 정답!
-    } else {
-      Alert.alert("아이디와 비밀번호를 입력하세요.");
+  try {
+    // 🔥 Firebase Auth 로그인
+    const userCredential = await signInWithEmailAndPassword(auth, id, password);
+    const user = userCredential.user;
+
+    // 🔥 Firestore 유저 정보 가져오기
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      Alert.alert("회원 정보가 존재하지 않습니다.");
+      return;
     }
-  };
 
+    const userData = userSnap.data();
+
+    // 🔥 로컬 저장 (닉네임 등)
+    await AsyncStorage.setItem("userNickname", userData.nickname);
+
+    Alert.alert("로그인 성공!");
+    navigation.navigate("MainTabs");
+
+  } catch (error: any) {
+    console.log(error);
+    Alert.alert("로그인 실패", "이메일 또는 비밀번호를 확인하세요.");
+  }
+};
   return (
     <View style={styles.container}>
       {/* 로고 */}

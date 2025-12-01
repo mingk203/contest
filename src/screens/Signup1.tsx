@@ -21,7 +21,12 @@ const RadioCircle = styled.View<{ selected: boolean }>` width: 20px; height: 20p
 const RadioText = styled.Text` font-size: 15px; color: #333; `;
 const Button = styled.TouchableOpacity` width: 140px; height: 44px; background-color: #4f7b6c; border-radius: 22px; justifyContent: center; alignItems: center; margin-top: 10px; `;
 const ButtonText = styled.Text` color: white; font-size: 15px; font-weight: bold; `;
-
+const LoginLink = styled.Text`
+  color: #666;
+  margin-top: 20px;
+  font-size: 13px;
+  text-decoration: underline;
+`;
 export default function Signup1({ navigation }: { navigation: any }) {
   const [age, setAge] = useState("");
   const [height, setHeight] = useState("");
@@ -105,6 +110,9 @@ export default function Signup1({ navigation }: { navigation: any }) {
         <Button onPress={handleNext}>
           <ButtonText>다음</ButtonText>
         </Button>
+        <LoginLink onPress={() => navigation.navigate("Login")}>
+  로그인하러 가기
+</LoginLink>
       </Container>
     </TouchableWithoutFeedback>
   );

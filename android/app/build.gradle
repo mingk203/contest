@@ -118,3 +118,4 @@ dependencies {
     }
      implementation project(':react-native-safe-area-context')
 }
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"

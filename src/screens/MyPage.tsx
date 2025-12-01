@@ -4,42 +4,59 @@ import { TouchableOpacity, View, Alert } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { auth } from '../firebaseConfig'; 
 import AsyncStorage from "@react-native-async-storage/async-storage"; // 🔥 추가
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
 
 const MyPage = ({ navigation }: { navigation: any }) => {
   const [userEmail, setUserEmail] = useState("-");
   const [userTags, setUserTags] = useState<string[]>([]);
   const [menuVisible, setMenuVisible] = useState(false);
+const [displayNickname, setDisplayNickname] = useState("사용자");
 
   // 화면이 포커스 될 때마다 정보 갱신
-  useEffect(() => {
-    const fetchUserData = async () => {
-      // 1. 이메일 정보 가져오기
-      const user = auth.currentUser;
-      if (user && user.email) {
-        setUserEmail(user.email);
-      } else {
-        setUserEmail("게스트");
-      }
+ useEffect(() => {
+  const fetchUserData = async () => {
+    const user = auth.currentUser;
 
-      // 2. 🔥 저장된 태그 불러오기 (DB 대용)
+    if (user && user.email) {
+      setUserEmail(user.email);
+    } else {
+      setUserEmail("게스트");
+    }
+
+    // 🔥 Firestore에서 닉네임 불러오기
+    if (user) {
       try {
-        const savedTags = await AsyncStorage.getItem("userTags");
-        if (savedTags) {
-          setUserTags(JSON.parse(savedTags));
-        } else {
-          // 태그가 없으면 기본값
-          setUserTags(["#운동초보", "#열정만땅"]);
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          if (userData.nickname) {
+            setDisplayNickname(userData.nickname);
+          }
         }
-      } catch (e) {
-        console.log("태그 불러오기 실패", e);
+      } catch (err) {
+        console.log("닉네임 로드 실패:", err);
       }
-    };
+    }
 
-    const unsubscribe = navigation.addListener('focus', fetchUserData);
-    return unsubscribe;
-  }, [navigation]);
+    // 🔥 저장된 태그 불러오기
+    try {
+      const savedTags = await AsyncStorage.getItem("userTags");
+      if (savedTags) {
+        setUserTags(JSON.parse(savedTags));
+      } else {
+        setUserTags(["#운동초보", "#열정만땅"]);
+      }
+    } catch (e) {
+      console.log("태그 불러오기 실패", e);
+    }
+  };
 
-  const displayNickname = userEmail.split('@')[0]; // 이메일 앞부분을 닉네임으로
+  const unsubscribe = navigation.addListener('focus', fetchUserData);
+  return unsubscribe;
+}, [navigation]);
 
   return (
     <>
