@@ -24,6 +24,10 @@ import CourseScreen from "./CourseScreen";
 import CourseDetailScreen from "./CourseDetailScreen";
 
 import SupportModal from "./SupportModal";
+import Notifications from "./Notifications";
+import ApplicationDetail from "./ApplicationDetail";
+
+
 
 // --- Navigators ---
 const Stack = createNativeStackNavigator();
@@ -82,6 +86,18 @@ function MainTabs() {
         }}
       />
 
+      <Tab.Screen
+  name="Notifications"
+  component={Notifications}
+  options={{
+    tabBarLabel: "알림",
+    tabBarIcon: ({ color }:{color:string}) => (
+      <Icon name="notifications" size={26} color={color} />
+    ),
+  }}
+/>
+
+
     </Tab.Navigator>
   );
 }
@@ -120,6 +136,7 @@ export default function Navigation() {
 
         {/* 7) 프로필 수정 */}
         <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen name="ApplicationDetail" component={ApplicationDetail} />
 
         {/* 8) 지원 모달 */}
         <Stack.Screen

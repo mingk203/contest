@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native";
-import { TouchableOpacity, View, Alert } from "react-native";
+import { TouchableOpacity, View, Alert,Text} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { auth } from '../firebaseConfig'; 
 import AsyncStorage from "@react-native-async-storage/async-storage"; // 🔥 추가
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { collection, query, where, getDocs} from "firebase/firestore";
 
 const MyPage = ({ navigation }: { navigation: any }) => {
   const [userEmail, setUserEmail] = useState("-");
   const [userTags, setUserTags] = useState<string[]>([]);
   const [menuVisible, setMenuVisible] = useState(false);
 const [displayNickname, setDisplayNickname] = useState("사용자");
+const [myClubs, setMyClubs] = useState<any[]>([]);
+const [favoriteClubs, setFavoriteClubs] = useState<any[]>([]);
+const [myApplications, setMyApplications] = useState<any[]>([]);
+
+
 
   // 화면이 포커스 될 때마다 정보 갱신
  useEffect(() => {
@@ -52,11 +58,82 @@ const [displayNickname, setDisplayNickname] = useState("사용자");
     } catch (e) {
       console.log("태그 불러오기 실패", e);
     }
-  };
 
-  const unsubscribe = navigation.addListener('focus', fetchUserData);
-  return unsubscribe;
-}, [navigation]);
+
+    if (user) {
+  try {
+    const q = query(
+      collection(db, "crewPosts"),
+      where("uid", "==", user.uid)
+    );
+    const snapshot = await getDocs(q);
+    const myList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    setMyClubs(myList);
+  } catch (e) {
+    console.log("내 동호회 로드 실패:", e);
+  }
+}
+
+if (user) {
+  try {
+    const q = query(
+      collection(db, "favorites"),
+      where("uid", "==", user.uid)
+    );
+    const snapshot = await getDocs(q);
+    const favList = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    setFavoriteClubs(favList);
+  } catch (e) {
+    console.log("찜 목록 불러오기 실패:", e);
+  }
+}
+
+
+// 내가 지원한 동호회
+   if (user) {
+        try {
+          const q = query(collection(db, "applications"), where("applicantUid", "==", user.uid));
+          const snap = await getDocs(q);
+
+          // 크루 이름을 포함한 신청 목록 만들기
+          const applicationsWithNames = await Promise.all(
+             snap.docs.map(async (docSnap)=> {
+              const appData = docSnap.data();
+              const crewId = appData.crewId;
+
+              // `crewPosts`에서 `crewId`에 해당하는 크루 정보 가져오기
+              const crewRef = doc(db, "crewPosts", crewId);
+              const crewSnap = await getDoc(crewRef);
+            
+            let crewName = "";
+          if (crewSnap.exists()) {
+            const crewData = crewSnap.data() as { name: string }; // 타입을 명시적으로 설정
+            crewName = crewData.name; // 크루 이름 가져오기
+          }
+              return {
+                ...appData,
+                crewName, // 크루 이름 추가
+              };
+            })
+          );
+
+          setMyApplications(applicationsWithNames); // 크루 이름이 포함된 신청 목록 설정
+        } catch (e) {
+          console.log("지원 목록 로드 실패:", e);
+        }
+      }
+    };
+  
+    fetchUserData();
+  }, []);
+
+
 
   return (
     <>
@@ -108,14 +185,110 @@ const [displayNickname, setDisplayNickname] = useState("사용자");
         </Header>
 
         <Section>
-          <SectionTitle>🏃 가입된 동호회</SectionTitle>
-          <PlaceholderBox><EmptyText>아직 가입된 동호회가 없습니다.</EmptyText></PlaceholderBox>
-        </Section>
+  <SectionTitle>내가 작성한 동호회</SectionTitle>
 
-        <Section>
-          <SectionTitle>❤️ 찜한 동호회</SectionTitle>
-          <PlaceholderBox><EmptyText>찜한 동호회가 없습니다.</EmptyText></PlaceholderBox>
-        </Section>
+  {myClubs.length === 0 ? (
+    <PlaceholderBox>
+      <EmptyText>아직 작성한 동호회가 없습니다.</EmptyText>
+    </PlaceholderBox>
+  ) : (
+    myClubs.map((club) => (
+      <TouchableOpacity
+        key={club.id}
+        onPress={() => navigation.navigate("ClubDetail", { club })}
+      >
+        <PlaceholderBox
+          style={{ borderStyle: "solid", alignItems: "flex-start", padding: 15 }}
+        >
+          <Text style={{ fontWeight: "700", fontSize: 15 }}>{club.name}</Text>
+          <Text style={{ color: "#555", marginTop: 5 }}>{club.desc}</Text>
+        </PlaceholderBox>
+      </TouchableOpacity>
+    ))
+  )}
+</Section>
+
+
+       <Section>
+  <SectionTitle>🏃 가입된 동호회</SectionTitle>
+  {myClubs.length === 0 ? (
+    <PlaceholderBox>
+      <EmptyText>아직 가입된 동호회가 없습니다.</EmptyText>
+    </PlaceholderBox>
+  ) : (
+    myClubs.map((club) => (
+      <TouchableOpacity
+        key={club.id}
+        onPress={() => navigation.navigate("ClubDetail", { club })}
+      >
+        <PlaceholderBox style={{ borderStyle: "solid", alignItems: "flex-start", padding: 15 }}>
+          <Text style={{ fontWeight: "700", fontSize: 15 }}>{club.name}</Text>
+          <Text style={{ color: "#555", marginTop: 5 }}>{club.desc}</Text>
+          <Text style={{ color: club.status === 'accepted' ? 'green' : 'red', marginTop: 5 }}>
+            {club.status === 'accepted' ? '승인됨' : '승인 대기'}
+          </Text>
+        </PlaceholderBox>
+      </TouchableOpacity>
+    ))
+  )}
+</Section>
+
+   <Section>
+  <SectionTitle>📌 내가 지원한 동호회</SectionTitle>
+
+  {myApplications.length === 0 ? (
+    <PlaceholderBox>
+      <EmptyText>아직 지원한 동호회가 없습니다.</EmptyText>
+    </PlaceholderBox>
+  ) : (
+    myApplications.map(app => (
+      <TouchableOpacity
+        key={app.id}
+        onPress={() => navigation.navigate("ClubDetail", { id: app.crewId })}
+      >
+        <PlaceholderBox style={{ padding: 15, alignItems: "flex-start" }}>
+
+          {/* 크루 이름 표시 */}
+          <Text style={{ fontSize: 15, fontWeight: "700" }}>{app.crewName}</Text>
+
+     
+
+          {/* 크루 상태 표시기 */}
+          <StatusBadge status={app.status}>
+            <Text style={{ color: 'white', fontSize: 12 }}>
+              {app.status === 'accepted' ? '승인됨' : '승인 대기'}
+            </Text>
+          </StatusBadge>
+        </PlaceholderBox>
+      </TouchableOpacity>
+    ))
+  )}
+</Section>
+
+     <Section>
+  <SectionTitle>❤️ 찜한 동호회</SectionTitle>
+
+  {favoriteClubs.length === 0 ? (
+    <PlaceholderBox>
+      <EmptyText>찜한 동호회가 없습니다.</EmptyText>
+    </PlaceholderBox>
+  ) : (
+    favoriteClubs.map((club) => (
+      <TouchableOpacity
+        key={club.id}
+        onPress={() => navigation.navigate("ClubDetail", { club })}
+      >
+        <PlaceholderBox
+          style={{ borderStyle: "solid", alignItems: "flex-start", padding: 15 }}
+        >
+          <Text style={{ fontWeight: "700", fontSize: 15 }}>{club.name}</Text>
+          <Text style={{ color: "#555", marginTop: 5 }}>{club.desc}</Text>
+        </PlaceholderBox>
+      </TouchableOpacity>
+    ))
+  )}
+</Section>
+
       </Container>
     </>
   );
@@ -140,7 +313,33 @@ const MenuWrapper = styled.View` position: relative; `;
 const MenuBox = styled.View` position: absolute; top: 30px; right: 0; background-color: white; border-radius: 8px; elevation: 5; z-index: 10; min-width: 100px; `;
 const MenuButton = styled.TouchableOpacity` padding: 12px; `;
 const MenuText = styled.Text` font-size: 14px; color: #333; `;
-const Section = styled.View` margin-bottom: 30px; `;
+const Section = styled.View`
+  display: flex;
+  flex-direction: column; /* 가로로 나열 */
+  flex-wrap: nowrap;     /* 줄 바꿈 없이 한 줄로 나열 */
+  margin-bottom: 30px;
+  overflow-x: auto;      /* 가로 스크롤이 가능하도록 설정 */
+`;
+
 const SectionTitle = styled.Text` font-size: 17px; font-weight: bold; margin-bottom: 12px; color: #333; margin-left: 4px; `;
-const PlaceholderBox = styled.View` width: 100%; height: 80px; background-color: #fff; border-radius: 12px; justify-content: center; align-items: center; border: 1px dashed #ccc; `;
+const PlaceholderBox = styled.View`
+  display: flex;
+  flex-direction: column;
+  width: 150px;  /* 각 아이템의 너비 설정 */
+  height: 100px;  /* 각 아이템의 높이 설정 */
+  background-color: #fff;
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+  border: 1px dashed #ccc;
+  margin-right: 15px;  /* 아이템 간 간격 추가 */
+`;
 const EmptyText = styled.Text` color: #999; font-size: 14px; `;
+// 상태 배지를 위한 스타일 컴포넌트
+const StatusBadge = styled.View<{ status: string }>`
+  background-color: ${(props) => (props.status === 'accepted' ? 'green' : 'red')};
+  padding: 6px 12px;
+  border-radius: 20px;
+  margin-top: 8px;
+  align-self: flex-start;
+`;

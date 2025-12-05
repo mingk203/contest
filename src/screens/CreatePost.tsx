@@ -106,6 +106,7 @@ const CreatePost = ({ navigation }: { navigation: any }) => {
   const [condition, setCondition] = useState("");
   const [schedule, setSchedule] = useState("");
   const [imageUrl, setImageUrl] = useState(""); // 사진 기능 추후 연결
+  const [maxCapacity, setMaxCapacity] = useState(""); // 최대 정원 상태 추가
 
   // const [location] = useState("충남 아산 신창면"); // 지금은 고정값
 const location = "충남 아산 신창면";
@@ -124,6 +125,13 @@ const location = "충남 아산 신창면";
         return;
       }
 
+         // 최대 정원 입력값 숫자로 변환 (정수로)
+      const parsedMaxCapacity = parseInt(maxCapacity, 10);
+      if (isNaN(parsedMaxCapacity) || parsedMaxCapacity <= 0) {
+        Alert.alert("정원은 1명 이상의 숫자로 입력해주세요.");
+        return;
+      }
+
       const newPost = {
         name,
         desc,
@@ -132,6 +140,7 @@ const location = "충남 아산 신창면";
         condition,
         schedule,
         imageUrl,
+         maxCapacity: parsedMaxCapacity,
         uid: user.uid,               // 🔥 현재 로그인된 사용자 UID
         createdAt: Timestamp.now(),  // Firestore 서버 시간
       };
@@ -183,6 +192,18 @@ const location = "충남 아산 신창면";
 
         <Label>장소 및 일시</Label>
         <Input placeholder="예) 신창역 1번 출구 / 매주 수·토" value={schedule} onChangeText={setSchedule} />
+      </Card>
+
+           {/* 최대 정원 입력란 */}
+      <SectionTitle>최대 정원</SectionTitle>
+      <Card>
+        <Label>최대 정원</Label>
+        <Input
+          placeholder="예) 20명"
+          value={maxCapacity}
+          onChangeText={setMaxCapacity}
+          keyboardType="numeric" // 숫자만 입력받기 위해 설정
+        />
       </Card>
 
       {/* 업로드 버튼 */}

@@ -105,11 +105,10 @@ export default function ClubScreen() {
             <TouchableOpacity
               key={club.id}
               style={styles.card}
-              onPress={() =>
-                navigation.navigate("ClubDetail", {
-                  club,
-                })
-              }
+             onPress={() =>
+  navigation.navigate("ClubDetail", { id: club.id })
+}
+
             >
               <View style={styles.imageBox} />
               <View style={styles.textBox}>

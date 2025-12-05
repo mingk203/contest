@@ -13,6 +13,8 @@ import {
   limit,
   getDocs 
 } from "firebase/firestore";
+import { TouchableOpacity } from "react-native";
+
 
 import { db } from "../firebaseConfig";
 
@@ -27,19 +29,20 @@ const TotalContainer = styled.ScrollView.attrs({
 
 const TopHeader = styled.View`
   width: 100%;
-  background-color: #3f7361ff;
+  background-color: #ffffff;   /* 흰색 배경 */
   padding: 15px 20px;
   flex-direction: row;
   align-items: center;
+  border-bottom-width: 1px;
+  border-bottom-color: #e5e5e5;  /* 아래 라인만 얇게 */
 `;
 
 const LocationText = styled.Text`
   font-size: 17px;
   font-weight: 600;
-  color: white;
+  color: #3f7361;  /* 포인트 컬러 */
   margin-left: 8px;
 `;
-
 /* -------------------------------------
    📌 상단 배너
 -------------------------------------- */
@@ -82,7 +85,7 @@ const ViewAllBtn = styled.TouchableOpacity`
    📌 우리 동네 크루 카드
 -------------------------------------- */
 
-const CrewCard = styled.View`
+const CrewCard = styled(TouchableOpacity)`
   flex-direction: row;
   background-color: #ffffff;
   border-radius: 12px;
@@ -153,6 +156,8 @@ const NearDistance = styled.Text`
   color: #777;
 `;
 
+
+
 /* =============================
       📌 Home Screen Component
 ============================= */
@@ -199,10 +204,10 @@ const [crewList, setCrewList] = useState<any[]>([]);
     <>
       <TotalContainer>
         {/* 상단 위치 */}
-        <TopHeader>
-          <Icon name="location-sharp" size={20} color="white" />
-          <LocationText>충청남도 아산시 신창면</LocationText>
-        </TopHeader>
+       <TopHeader>
+  <Icon name="location-sharp" size={20} color="#3f7361" />
+  <LocationText>충청남도 아산시 신창면</LocationText>
+</TopHeader>
 
         {/* 배너 */}
         <BannerWrapper>
@@ -236,7 +241,7 @@ const [crewList, setCrewList] = useState<any[]>([]);
   </CrewDesc>
 ) : (
   crewList.map((crew) => (
-    <CrewCard key={crew.id}>
+       <CrewCard key={crew.id} onPress={() => navigation.navigate("Club", { crewId: crew.id })}>
       <CrewInfo>
         <CrewName>{crew.name}</CrewName>
         <CrewDesc>{crew.desc}</CrewDesc>
@@ -249,7 +254,12 @@ const [crewList, setCrewList] = useState<any[]>([]);
         {/* ------------------------------- */}
         {/* 📌 근처 체육시설 */}
         {/* ------------------------------- */}
-        <NearTitle>나의 근처 체육시설</NearTitle>
+        <SectionHeader>
+        <NearTitle>체육 이용권</NearTitle>
+        <ViewAllBtn onPress={() => navigation.navigate("Course")}>
+    <Icon name="chevron-forward-outline" size={20} color="#000" />
+  </ViewAllBtn>
+  </SectionHeader>
 
         <NearScroll>
           <NearCard>
