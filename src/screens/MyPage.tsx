@@ -209,30 +209,7 @@ if (user) {
 </Section>
 
 
-       <Section>
-  <SectionTitle>🏃 가입된 동호회</SectionTitle>
-  {myClubs.length === 0 ? (
-    <PlaceholderBox>
-      <EmptyText>아직 가입된 동호회가 없습니다.</EmptyText>
-    </PlaceholderBox>
-  ) : (
-    myClubs.map((club) => (
-      <TouchableOpacity
-        key={club.id}
-        onPress={() => navigation.navigate("ClubDetail", { club })}
-      >
-        <PlaceholderBox style={{ borderStyle: "solid", alignItems: "flex-start", padding: 15 }}>
-          <Text style={{ fontWeight: "700", fontSize: 15 }}>{club.name}</Text>
-          <Text style={{ color: "#555", marginTop: 5 }}>{club.desc}</Text>
-          <Text style={{ color: club.status === 'accepted' ? 'green' : 'red', marginTop: 5 }}>
-            {club.status === 'accepted' ? '승인됨' : '승인 대기'}
-          </Text>
-        </PlaceholderBox>
-      </TouchableOpacity>
-    ))
-  )}
-</Section>
-
+     
    <Section>
   <SectionTitle>📌 내가 지원한 동호회</SectionTitle>
 

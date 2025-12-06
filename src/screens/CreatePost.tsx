@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components/native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { Alert } from "react-native";
+import { Alert ,Image} from "react-native";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { auth } from "../firebaseConfig"; //로그인한 유저 아이디 가져오기
-
+import { launchImageLibrary } from "react-native-image-picker"; // 이미지 선택 기능
+import storage from '@react-native-firebase/storage'; // Firebase Storage
 
 /* ─────────────────────────────────────────────── */
 /* 전체 컨테이너 */
@@ -111,6 +112,40 @@ const CreatePost = ({ navigation }: { navigation: any }) => {
   // const [location] = useState("충남 아산 신창면"); // 지금은 고정값
 const location = "충남 아산 신창면";
 
+  const handleImagePick = async () => {
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      quality: 0.5,
+    });
+
+     if (!result?.assets?.length) {
+      Alert.alert('이미지가 선택되지 않았습니다.');
+      return;
+    }
+
+   
+    const source = result.assets[0].uri; // 선택된 이미지의 URI
+    if (!source) {
+      Alert.alert('이미지 URI를 찾을 수 없습니다.');
+      return;
+    }
+
+    // Firebase Storage에 이미지 업로드
+    const fileName = source.substring(source.lastIndexOf('/') + 1); // 파일 이름 추출
+    const reference = storage().ref(fileName);
+
+    try {
+      await reference.putFile(source); // Firebase에 파일 업로드
+      const imageUrl = await reference.getDownloadURL(); // 다운로드 URL 얻기
+      setImageUrl(imageUrl); // 상태에 이미지 URL 저장
+      Alert.alert('사진 업로드 성공');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('사진 업로드 실패');
+    }
+  };
+
+
   const handleUpload = async () => {
     try {
       const user = auth.currentUser;
@@ -163,11 +198,15 @@ const location = "충남 아산 신창면";
         <LocationText>{location}</LocationText>
       </TopHeader>
 
-      {/* 동호회 사진 */}
+          {/* 동호회 사진 */}
       <SectionTitle>동호회 사진</SectionTitle>
       <Card>
-        <PhotoBox onPress={() => Alert.alert("📷 사진 추가 기능은 추후 연결 예정")}>
-          <Icon name="add" size={40} color="#888" />
+        <PhotoBox onPress={handleImagePick}>
+          {imageUrl ? (
+            <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%', borderRadius: 10 }} />
+          ) : (
+            <Icon name="add" size={40} color="#888" />
+          )}
         </PhotoBox>
       </Card>
 

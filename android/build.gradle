@@ -19,3 +19,14 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+buildscript {
+    repositories {
+        google()  // Firebase repositories 추가
+        mavenCentral()
+    }
+    dependencies {
+        classpath('com.google.gms:google-services:4.3.10')  // 최신 버전 확인 후 추가
+    }
+}
+

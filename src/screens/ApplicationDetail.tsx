@@ -4,6 +4,7 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import Icon from "react-native-vector-icons/Ionicons"; // 아이콘 사용
 
 
 export default function ApplicationDetail() {
@@ -74,6 +75,10 @@ export default function ApplicationDetail() {
 
   return (
     <View style={styles.container}>
+ <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Icon name="arrow-back" size={24} color="#fff" />
+      </TouchableOpacity>
+
       <Text style={styles.title}>지원서 상세보기</Text>
 
       <View style={styles.box}>
@@ -119,4 +124,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   btnText: { color: "white", fontSize: 16, fontWeight: "700" },
+
+  // 돌아가기 버튼 스타일
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    backgroundColor: "#3f7361",
+    padding: 10,
+    borderRadius: 50,
+  },
 });
